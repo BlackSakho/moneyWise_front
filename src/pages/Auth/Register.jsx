@@ -38,11 +38,20 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <input
             type="text"
-            placeholder="Nom complet"
-            {...register("name", { required: "Le nom est requis" })}
-            className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400"
+            placeholder="Prénom" // Changé
+            {...register("prenom", { required: "Le prénom est requis" })} // Changé : "prenom"
+             className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400"
           />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+          {errors.prenom && <p className="text-red-500 text-sm">{errors.prenom.message}</p>} 
+
+          
+           <input
+           type="text"
+           placeholder="Nom" // Changé
+           {...register("nom", { required: "Le nom de famille est requis" })} // Changé : "nom"
+           className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400"
+          />
+          {errors.nom && <p className="text-red-500 text-sm">{errors.nom.message}</p>} 
 
           <input
             type="email"

@@ -3,7 +3,7 @@ import React from "react"
 const Header = () => {
   return (
      <div className="flex flex-col md:flex-row items-center justify-between px-2 md:px-4 py-3 bg-gray-200">
-            <div className="text-2xl font-bold text-gray-800">💸 MoneyWise</div>
+            <div className="text-2xl font-bold text-gray-800"> MoneyWise</div>
             <nav className="hidden md:flex space-x-8 text-gray-700">
               <a href="/" className="hover:text-green-500 transition">Accueil</a>
               <a href="#" className="hover:text-green-500 transition">À propos</a>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
+import { forgotPassword } from "../../api/api";
 
 export default function ForgotPasswordPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -14,12 +15,16 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      // 👉 Simule un appel API (à remplacer par ton backend plus tard)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setSuccess("Un lien de réinitialisation a été envoyé à votre adresse e-mail.");
+      // Appel réel à l'API
+      const response = await forgotPassword(data.email);
+      
+      if (response && response.data) {
+        setSuccess("Un lien de réinitialisation a été envoyé à votre adresse e-mail.");
+      } else {
+        setError("Une erreur est survenue. Veuillez réessayer.");
+      }
     } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      setError(err.response?.data?.message || "Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }

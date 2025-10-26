@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // 👉 Base URL du backend 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://moneywise-9crf.onrender.com/api";
 
 // Instance Axios configurée
 const api = axios.create({
@@ -22,6 +22,10 @@ export const loginUser = async (data) => {
 export const registerUser = async (data) => {
   const response = await api.post("/auth/register", data);
   return response.data;
+};
+
+export const forgotPassword = async (email) => {
+  return api.post("/auth/forgot-password", { email });
 };
 
 //  Exemple d’appel sécurisé

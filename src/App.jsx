@@ -6,8 +6,11 @@ import LoginPage from './pages/Auth/Login';
 import RegisterPage from './pages/Auth/Register';
 import ForgotPasswordPage from './pages/Auth/ForgotPassword';
 import Header from "./components/Header/index";
-import Footer from "./components/Footer/index"
-
+import Footer from "./components/Footer/index";
+import Dashboard from './pages/Dashboard';
+import Transactions from './pages/Transactions';
+import Profile from './pages/Profile';
+import AddTransaction from './pages/AddTransaction';
 
 
 function App() {
@@ -22,6 +25,12 @@ function App() {
         <Route path="/login" element={<LoginPage/>} />
         <Route path="/register" element={<RegisterPage/>} />
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
+        <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/transactions" element={<Transactions />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/add" element={<AddTransaction />} />
+
       </Routes>
       </Router>
       <Footer/>

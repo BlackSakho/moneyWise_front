@@ -10,20 +10,35 @@ export default function RegisterPage() {
   const [serverError, setServerError] = useState("");
   const password = watch("password");
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    setServerError("");
+ const onSubmit = async (data) => {
+  setLoading(true);
+  setServerError("");
 
-    try {
-      await registerUser(data);
-      alert("Compte créé avec succès !");
-      window.location.href = "/login";
-    } catch (error) {
-      setServerError(error.response?.data?.message || "Erreur lors de l’inscription.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    // 🔹 On sépare le nom complet en prénom + nom
+    const [prenom, ...rest] = data.name.split(" ");
+    const nom = rest.join(" ") || prenom;
+
+    // 🔹 On crée un "FormData" car le backend attend multipart/form-data
+    const formData = new FormData();
+    formData.append("nom", nom);
+    formData.append("prenom", prenom);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    formData.append("avatar", ""); // vide pour le moment
+
+    await registerUser(formData);
+
+    alert("Compte créé avec succès ✅");
+    window.location.href = "/login";
+  } catch (error) {
+    console.error(error);
+    setServerError(error.response?.data?.message || "Erreur lors de l'inscription ❌");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <motion.div

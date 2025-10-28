@@ -14,7 +14,7 @@ export default function LoginPage() {
     setServerError("");
     try {
       const res = await loginUser(data);
-      localStorage.setItem("token", res.token);
+localStorage.setItem("token", res.data.token);
       alert("Connexion réussie !");
       window.location.href = "/dashboard";
     } catch (error) {

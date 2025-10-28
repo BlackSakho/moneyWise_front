@@ -1,37 +1,41 @@
-
 import axios from "axios";
 
-// 👉 Base URL du backend 
-const API_URL = "http://localhost:5000/api";
-
-// Instance Axios configurée
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+const API = axios.create({
+  baseURL: "https://moneywise-9crf.onrender.com/api",
 });
 
-//  Fonction Login
+// 🔐 Ajouter automatiquement le token s’il existe
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+});
+
+// === AUTH ===
 export const loginUser = async (data) => {
-  const response = await api.post("/auth/login", data);
-  return response.data;
+  const res = await API.post("/auth/login", data);
+  return res.data;
 };
 
-//  Fonction Register
-export const registerUser = async (data) => {
-  const response = await api.post("/auth/register", data);
-  return response.data;
-};
-
-//  Exemple d’appel sécurisé
-export const getUserProfile = async (token) => {
-  const response = await api.get("/user/profile", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export const registerUser = async (formData) => {
+  const res = await API.post("/auth/register", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
-  return response.data;
+  return res.data;
 };
 
-export default api;
+// === TRANSACTIONS ===
+export const getTransactions = () => API.get("/transactions");
+export const addTransaction = (data) => API.post("/transactions", data);
+export const updateTransaction = (id, data) => API.put(`/transactions/${id}`, data);
+export const deleteTransaction = (id) => API.delete(`/transactions/${id}`);
+
+// === CATÉGORIES ===
+export const getCategories = () => API.get("/categories");
+
+// === PROFIL ===
+export const getProfile = () => API.get("/users/me");
+
+export default API;

@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { addTransaction, getCategories } from "../api/api";
 
 export default function AddTransaction() {
   const [form, setForm] = useState({
-    type: "dépense",
+    type: "DEPENSE",
     amount: "",
     category: "",
     description: "",
@@ -12,39 +13,73 @@ export default function AddTransaction() {
   });
   const [categories, setCategories] = useState([]);
 
-  // Charger les catégories depuis ton API
- useEffect(() => {
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await getCategories();
         console.log("📂 Réponse du backend (catégories):", res);
 
-        
+        // ✅ on accepte plusieurs formats de réponse possibles
+        const data =
+          res.data?.data?.categories ||
+          res.data?.data ||
+          res.data ||
+          [];
 
-const data = res.data?.data?.categories || [];
-setCategories(data);
-        setCategories(data);
+        if (data.length > 0) {
+          setCategories(data);
+        } else {
+          // ✅ fallback local si l’API est vide
+          setCategories([
+            { _id: "1", name: "Loyer" },
+            { _id: "2", name: "Courses" },
+            { _id: "3", name: "Transport" },
+            { _id: "4", name: "Divertissement" },
+            { _id: "5", name: "Salaire" },
+          ]);
+        }
       } catch (err) {
         console.error("❌ Erreur catégories :", err.response?.data || err);
-        alert("Impossible de charger les catégories ❌");
+        alert("Impossible de charger les catégories depuis le serveur ❌");
+
+        // ✅ fallback manuel si l’appel échoue
+        setCategories([
+          { _id: "1", name: "Loyer" },
+          { _id: "2", name: "Courses" },
+          { _id: "3", name: "Transport" },
+          { _id: "4", name: "Divertissement" },
+          { _id: "5", name: "Salaire" },
+        ]);
       }
     };
 
     fetchCategories();
   }, []);
 
-
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const selectedCategory = categories.find(
+      (cat) => cat.name === form.category || cat._id === form.category
+    );
+
+    const payload = {
+      ...form,
+      type: form.type.toUpperCase(), // ✅ correspond au format du back
+      category: selectedCategory ? selectedCategory._id : form.category, // ✅ envoie _id
+    };
+
+    console.log("📤 Données envoyées :", payload);
+
     try {
-      await addTransaction(form);
+      await addTransaction(payload);
       alert("Transaction ajoutée avec succès ✅");
       setForm({
-        type: "",
+        type: "DEPENSE",
         amount: "",
         category: "",
         description: "",
@@ -52,7 +87,7 @@ setCategories(data);
       });
     } catch (err) {
       console.error("❌ Erreur ajout :", err.response?.data || err);
-      alert("Erreur lors de l’ajout ❌");
+      alert(err.response?.data?.message || "Erreur lors de l’ajout ❌");
     }
   };
 
@@ -75,9 +110,8 @@ setCategories(data);
               className="w-full border p-2 rounded"
               required
             >
-              <option value="">-- Choisir --</option>
-              <option value="revenu">Revenu</option>
-              <option value="dépense">Dépense</option>
+              <option value="REVENUE">Revenu</option>
+              <option value="DEPENSE">Dépense</option>
             </select>
           </div>
 
@@ -103,15 +137,11 @@ setCategories(data);
               required
             >
               <option value="">-- Sélectionner une catégorie --</option>
-              {categories && categories.length > 0 ? (
-                categories.map((cat) => (
-                  <option key={cat._id} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))
-              ) : (
-                <option disabled>Aucune catégorie trouvée</option>
-              )}
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -150,3 +180,10 @@ setCategories(data);
     </div>
   );
 }
+
+
+
+
+
+
+

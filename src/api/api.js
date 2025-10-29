@@ -4,14 +4,18 @@ const API = axios.create({
   baseURL: "https://moneywise-9crf.onrender.com/api",
 });
 
+
 // 🔐 Ajouter automatiquement le token s’il existe
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {
+    // ✅ Double envoi du header pour gérer les deux cas : "Authorization" ET "authorization"
     req.headers.Authorization = `Bearer ${token}`;
+    req.headers.authorization = `Bearer ${token}`;
   }
   return req;
 });
+
 
 // === AUTH ===
 export const loginUser = async (data) => {

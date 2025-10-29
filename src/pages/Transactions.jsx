@@ -19,28 +19,32 @@ export default function Transactions() {
   });
 
   // 🔹 Charger les transactions depuis ton backend
- const fetchTransactions = async () => {
-  setLoading(true);
-  try {
-    const res = await getTransactions();
-    console.log("📦 Réponse du backend :", res);
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const res = await getTransactions();
+      console.log("📦 Réponse du backend :", res);
 
-    // ✅ Vérifie si c’est un tableau ou un objet
-    const data =
-      Array.isArray(res.data)
-        ? res.data
-        : Array.isArray(res.data?.data)
-        ? res.data.data
-        : [];
+      // ✅ Adaptation à la structure réelle du backend
+      const data =
+        res.data?.data?.transactions ||
+        res.data?.data ||
+        res.data ||
+        [];
 
-    setTransactions(data);
-  } catch (err) {
-    console.error("❌ Erreur de chargement :", err.response?.data || err);
-    alert("Impossible de récupérer les transactions ❌");
-  } finally {
-    setLoading(false);
-  }
-};
+      if (!Array.isArray(data)) {
+        console.warn("⚠️ Données inattendues :", data);
+        setTransactions([]);
+      } else {
+        setTransactions(data);
+      }
+    } catch (err) {
+      console.error("❌ Erreur de chargement :", err.response?.data || err);
+      alert("Impossible de récupérer les transactions ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchTransactions();
@@ -63,9 +67,9 @@ export default function Transactions() {
   const handleEditClick = (t) => {
     setEditing(t._id);
     setForm({
-      type: t.type,
+      type: t.type?.toLowerCase() === "revenue" ? "revenu" : "dépense",
       amount: t.amount,
-      category: t.category,
+      category: t.category?.name || t.category || "",
       description: t.description,
       date: t.date?.slice(0, 10) || "",
     });
@@ -74,17 +78,29 @@ export default function Transactions() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateTransaction(editing, form);
+      const updatedData = {
+        ...form,
+        type: form.type.toUpperCase(), // ✅ aligné avec le back
+      };
+
+      console.log("📝 Données envoyées :", updatedData);
+
+      await updateTransaction(editing, updatedData);
       alert("Transaction modifiée ✅");
       setEditing(null);
       fetchTransactions();
     } catch (err) {
-      console.error("Erreur modification :", err);
+      console.error("Erreur modification :", err.response?.data || err);
       alert("Erreur lors de la mise à jour ❌");
     }
   };
 
-  if (loading) return <p className="p-6">Chargement des transactions...</p>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-600">
+        Chargement des transactions...
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -113,19 +129,27 @@ export default function Transactions() {
             ) : (
               transactions.map((t) => (
                 <tr key={t._id} className="border-b hover:bg-gray-50">
-                  <td className="p-3">{t.type}</td>
+                  <td className="p-3">
+                    {t.type === "REVENUE" ? "Revenu" : "Dépense"}
+                  </td>
                   <td
                     className={`p-3 ${
-                      t.type === "revenu" ? "text-green-600" : "text-red-500"
+                      t.type === "REVENUE"
+                        ? "text-green-600"
+                        : "text-red-500"
                     }`}
                   >
-                    {t.type === "revenu" ? "+" : "-"}
+                    {t.type === "REVENUE" ? "+" : "-"}
                     {t.amount} €
                   </td>
-                  <td className="p-3">{t.category}</td>
+                  <td className="p-3">
+                    {t.category?.name || t.category || "—"}
+                  </td>
                   <td className="p-3">{t.description}</td>
                   <td className="p-3">
-                    {new Date(t.date).toLocaleDateString()}
+                    {t.date
+                      ? new Date(t.date).toLocaleDateString()
+                      : "—"}
                   </td>
                   <td className="p-3 text-center space-x-2">
                     <button
@@ -167,6 +191,7 @@ export default function Transactions() {
                     <option value="dépense">Dépense</option>
                   </select>
                 </div>
+
                 <div>
                   <label className="block mb-1">Montant (€)</label>
                   <input
@@ -179,6 +204,7 @@ export default function Transactions() {
                     className="w-full border p-2 rounded"
                   />
                 </div>
+
                 <div>
                   <label className="block mb-1">Catégorie</label>
                   <input
@@ -190,6 +216,7 @@ export default function Transactions() {
                     className="w-full border p-2 rounded"
                   />
                 </div>
+
                 <div>
                   <label className="block mb-1">Description</label>
                   <input
@@ -201,6 +228,7 @@ export default function Transactions() {
                     className="w-full border p-2 rounded"
                   />
                 </div>
+
                 <div>
                   <label className="block mb-1">Date</label>
                   <input
@@ -237,3 +265,12 @@ export default function Transactions() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+

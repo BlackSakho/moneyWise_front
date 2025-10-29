@@ -10,7 +10,7 @@ const Header = () => {
               <a href="#" className="hover:text-green-500 transition">Contact</a>
             </nav>
             <a
-              href="/dashboard"
+              href="/Login"
               className="bg-gray-200 text-gray-700 px-5 py-2 rounded-full hover:bg-gray-300 transition"
             >
               Se connecter
